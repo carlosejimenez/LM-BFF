@@ -30,6 +30,8 @@ def get_label(task, line):
             return 0 if float(line[-1]) < 2.5 else 1
         elif task == 'WNLI':
             return line[-1]
+        elif task == 'CSTS':
+            return line[-1]
         else:
             raise NotImplementedError
     else:

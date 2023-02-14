@@ -23,6 +23,10 @@ EVAL_STEP=100
 # All those parameters are set arbitrarily by observing the data distributions.
 TASK_EXTRA=""
 case $TASK in
+    CSTS)
+        TEMPLATE=*cls**sent_0*.*+sent_1*_is*mask**sep+*
+        MAPPING="{'0':'low','1':'high'}"  # use lowercase
+        ;;
     CoLA)
         TEMPLATE=*cls**sent_0*_This_is*mask*.*sep+*
         MAPPING="{'0':'incorrect','1':'correct'}"

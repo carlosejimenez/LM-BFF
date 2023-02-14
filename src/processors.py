@@ -163,6 +163,45 @@ class SnliProcessor(DataProcessor):
             examples.append(InputExample(guid=guid, text_a=text_a, text_b=text_b, label=label))
         return examples
 
+class CstsProcessor(DataProcessor):
+    """Processor for the CSTS data set. sentence key is sent_0 and condition key is sent_1"""
+    def get_example_from_tensor_dict(self, tensor_dict):
+        return InputExample(
+                tensor_dict["idx"].numpy(),
+                tensor_dict["sentence"].numpy().decode("utf-8"),
+                tensor_dict["condition"].numpy().decode("utf-8"),
+                str(tensor_dict["label"].numpy()),
+        )
+
+    def get_train_examples(self, data_dir):
+        """See base class."""
+        return self._create_examples(self._read_tsv(os.path.join(data_dir, "train.tsv")), "train")
+
+    def get_dev_examples(self, data_dir):
+        """See base class."""
+        return self._create_examples(self._read_tsv(os.path.join(data_dir, "dev.tsv")), "dev")
+
+    def get_test_examples(self, data_dir):
+        """See base class."""
+        return self._create_examples(self._read_tsv(os.path.join(data_dir, "test.tsv")), "test")
+
+    def get_labels(self):
+        """See base class."""
+        return ["0", "1"]
+
+    def _create_examples(self, lines, set_type):
+        """Creates examples for the training, dev and test sets."""
+        examples = []
+        for (i, line) in enumerate(lines):
+            if i == 0:
+                continue
+            guid = "%s-%s" % (set_type, line[0])
+            text_a = line[1]
+            text_b = line[2]
+            label = line[-1]
+            examples.append(InputExample(guid=guid, text_a=text_a, text_b=text_b, label=label))
+        return examples
+
 
 class ColaProcessor(DataProcessor):
     """Processor for the CoLA data set (GLUE version)."""
@@ -538,6 +577,7 @@ def text_classification_metrics(task_name, preds, labels):
 
 processors_mapping = {
     "cola": ColaProcessor(),
+    "csts": CstsProcessor(),
     "mnli": MnliProcessor(),
     "mnli-mm": MnliMismatchedProcessor(),
     "mrpc": MrpcProcessor(),
@@ -558,6 +598,7 @@ processors_mapping = {
 
 num_labels_mapping = {
     "cola": 2,
+    "csts": 2,
     "mnli": 3,
     "mrpc": 2,
     "sst-2": 2,
@@ -577,6 +618,7 @@ num_labels_mapping = {
 
 output_modes_mapping = {
     "cola": "classification",
+    "csts": "classification",
     "mnli": "classification",
     "mnli-mm": "classification",
     "mrpc": "classification",
@@ -598,6 +640,7 @@ output_modes_mapping = {
 # Return a function that takes (task_name, preds, labels) as inputs
 compute_metrics_mapping = {
     "cola": glue_compute_metrics,
+    "csts": text_classification_metrics,
     "mnli": glue_compute_metrics,
     "mnli-mm": glue_compute_metrics,
     "mrpc": glue_compute_metrics,
