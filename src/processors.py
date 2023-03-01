@@ -22,6 +22,7 @@ from sentence_transformers import SentenceTransformer, util
 from copy import deepcopy
 import pandas as pd
 import logging
+import pdb
 
 logger = logging.getLogger(__name__)
 
@@ -192,6 +193,7 @@ class CstsProcessor(DataProcessor):
     def _create_examples(self, lines, set_type):
         """Creates examples for the training, dev and test sets."""
         examples = []
+        pdb.set_trace()
         for (i, line) in enumerate(lines):
             if i == 0:
                 continue
